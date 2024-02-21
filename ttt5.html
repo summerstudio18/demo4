@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+    <style type="text/css">
+        h1 {
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
+            font-weight: bold;
+            color: rgb(55, 113, 239);
+            text-align: center;
+        }
+        #board {
+            width:400px;
+            margin: auto;
+        }
+
+        .square {
+            width: 120px;
+            height: 120px;
+            margin: 5px;
+            background-color: #aadeff;
+            display: inline-block;
+            vertical-align: top;
+            font-size: 40px;
+            font-family:Arial, Helvetica, sans-serif;
+            color:rgb(60, 12, 123);
+            text-align: center;
+            box-sizing: border-box;
+            line-height: 100px;
+            border-radius: 5px;    
+        }
+        
+        .square:hover {
+            background-color: rgb(55, 113, 239);
+        }
+
+        .turn {
+            margin: 5px auto;
+            background-color: rgb(27, 93, 237);
+            font-size: 16px;
+            font-weight: bold;
+            font-family: Arial, Helvetica, sans-serif;
+            color: rgb(240, 250, 124);
+            padding: 10px 10px;
+            width: 366px;
+            text-align: center;
+            border-radius: 30px;
+        }
+
+        .result {
+            font-size: 16px;
+            font-weight: bold;
+            color: rgb(222, 16, 140);
+            margin: 5px 5px;
+            padding: 5px 5px;
+            width: 278px;
+            text-align: center;
+        }
+
+        .startGameBtn {
+            font-size: 16px;
+            font-weight: bold;
+            color: rgb(232, 245, 87);
+            margin: auto;
+            padding: 10px;
+            width: 180px;
+            text-align: center;
+            border-radius: 30px;
+            background-color:rgb(222, 16, 140);
+        }
+
+    </style>
+
+</head>
+<body>
+    
+    <h1>TIC TAC TOE</h1>
+    <div class="turn"></div>
+    <div id="board" class="board"></div>
+    <div style="text-align: center; padding: 10px;"><button class="startGameBtn" id="startGameBtn" onclick="clearBoard()">Start Game</button></div>
+    <script>
+        // Variables to track whose turn it is and the current symbol (X or O)
+        let currentPlayer;
+        const symbols = ['X', 'O'];
+        let boardLocked = false;
+    
+        // Function to randomly choose the starting player
+        function chooseStartingPlayer() {
+            currentPlayer = symbols[Math.floor(Math.random() * symbols.length)];
+            document.querySelector('.turn').innerText = "It's " + currentPlayer + "'s turn.";
+        }
+    
+        // Function to toggle between X and O for the next turn
+        function togglePlayer() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            document.querySelector('.turn').innerText = "It's " + currentPlayer + "'s turn.";
+        }
+    
+        // Function to handle square click events
+        function handleSquareClick(squareId) {
+            const square = document.getElementById(squareId);
+            // Check if the square is empty and the board is not locked before placing the symbol
+            if (!square.innerText && !boardLocked) {
+                square.innerText = currentPlayer;
+                // Toggle to the next player after placing the symbol
+                togglePlayer();
+            }
+        }
+
+
+
+        // Construct the board with squares using a loop
+        const NUM_SQUARES = 9;
+        const board = document.getElementById('board');
+        for (let i = 0; i < NUM_SQUARES; i++) {
+            const id = "sq" + i;
+            const square = document.createElement('div');
+            square.classList.add('square');
+            square.setAttribute('id', id);
+            board.appendChild(square);
+            // Add click event listener to handle square clicks
+            square.addEventListener('click', function() {
+                handleSquareClick(id);
+            });
+        }
+    
+        // Initialize the turn display and choose the starting player
+        chooseStartingPlayer();
+
+
+        // Clear board when hitting the Start Game button
+        function clearBoard() {
+            const squares = document.querySelectorAll('.square');
+            squares.forEach(square => {
+                square.innerText = '';
+            });
+            boardLocked = false;
+            gameStatus = '';
+            chooseStartingPlayer();
+        }
+
+
+        // Function to create an array of moves based on the current board
+        function getMoves() {
+            const squares = document.querySelectorAll('.square');
+            const moves = Array.from(squares).map(square => square.innerText || '-');
+            return moves;
+        }
+
+
+
+        // Function to handle square click events
+        function handleSquareClick(squareId) {
+            const square = document.getElementById(squareId);
+            if (!square.innerText && !boardLocked) {
+                square.innerText = currentPlayer;
+                togglePlayer();
+                checkGameStatus();
+            }
+        }
+ 
+
+
+        // Check the win conditions
+        function checkGameStatus() {
+            const squares = Array.from(document.querySelectorAll('.square')).map(square => square.innerText);
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], 
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], 
+                [0, 4, 8], [2, 4, 6]             
+            ];
+            const winStrings = winConditions.map(indices => indices.map(i => squares[i]).join(''));
+            
+            const xWins = winStrings.some(str => str === 'XXX');
+            const oWins = winStrings.some(str => str === 'OOO');
+            const isStalemate = !squares.includes('');
+            
+            if (xWins) {
+                gameStatus = "X wins!";
+                boardLocked = true;
+            } else if (oWins) {
+                gameStatus = "O wins!";
+                boardLocked = true;
+            } else if (isStalemate) {
+                gameStatus = "Stalemate!";
+                boardLocked = true;
+            }
+            
+            if (gameStatus) {
+                document.querySelector('.turn').innerText = gameStatus;
+            }
+        }
+            
+    </script>
+</body>
+</html>
